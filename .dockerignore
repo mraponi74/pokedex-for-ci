@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.github
+cypress
+cypress.json
+test
+README.md
+*.log

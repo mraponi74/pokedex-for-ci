@@ -1,0 +1,12 @@
+services:
+  pokedex:
+    image: ghcr.io/mraponi74/pokedex-for-ci:latest
+    container_name: pokedex
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
