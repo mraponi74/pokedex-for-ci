@@ -130,7 +130,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
-            cd ~/pokedex-for-ci
+            set -e
+            cd ~/nervic_cloud/pokedex-for-ci
             docker compose pull
             docker compose up -d
             docker image prune -f
