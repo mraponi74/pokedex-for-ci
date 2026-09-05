@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-
+  
   avoid_reduncy:
     runs-on: ubuntu-latest   
     steps:
@@ -132,6 +132,25 @@ jobs:
           script: |
             set -e
             cd ~/nervic_cloud/pokedex-for-ci
+            IMAGE=ghcr.io/${{ github.repository }}
+
+            docker tag $IMAGE:latest $IMAGE:previous 2>/dev/null || true
+
             docker compose pull
             docker compose up -d
+
+            echo "Waiting for healthcheck..."
+            for i in $(seq 1 15); do
+              status=$(docker inspect --format='{{.State.Health.Status}}' pokedex 2>/dev/null || echo starting)
+              echo "Attempt $i: $status"
+              [ "$status" = "healthy" ] && break
+              if [ "$status" = "unhealthy" ] || [ "$i" = "15" ]; then
+                echo "Healthcheck failed, rolling back to previous image"
+                docker tag $IMAGE:previous $IMAGE:latest
+                docker compose up -d
+                exit 1
+              fi
+              sleep 10
+            done
+
             docker image prune -f
