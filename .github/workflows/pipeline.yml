@@ -141,10 +141,10 @@ jobs:
 
             echo "Waiting for healthcheck..."
             for i in $(seq 1 15); do
-              status=$(docker inspect --format='{{.State.Health.Status}}' pokedex 2>/dev/null || echo starting)
-              echo "Attempt $i: $status"
-              [ "$status" = "healthy" ] && break
-              if [ "$status" = "unhealthy" ] || [ "$i" = "15" ]; then
+              health=$(docker inspect --format='{{.State.Health.Status}}' pokedex 2>/dev/null || echo starting)
+              echo "Attempt $i: $health"
+              [ "$health" = "healthy" ] && break
+              if [ "$health" = "unhealthy" ] || [ "$i" = "15" ]; then
                 echo "Healthcheck failed, rolling back to previous image"
                 docker tag $IMAGE:previous $IMAGE:latest
                 docker compose up -d
